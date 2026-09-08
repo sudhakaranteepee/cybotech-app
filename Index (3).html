@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cybotech CCTV Service App</title>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQ3lib3RlY2ggQ0NUViBTZXJ2aWNlIiwic2hvcnRfbmFtZSI6IkN5Ym90ZWNoIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzExMTgyNyIsInRoZW1lX2NvbG9yIjoiIzExMTgyNyJ9">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui, 'Noto Sans Malayalam', sans-serif}
+body{background:#f1f5f9}
+.header{background:#111827;color:white;padding:14px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
+.header img{width:42px;height:42px;background:white;border-radius:10px;padding:4px}
+.login-box{max-width:420px;margin:50px auto;background:white;padding:26px;border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+.btn{width:100%;padding:13px;border:none;border-radius:12px;cursor:pointer;font-weight:700;margin-top:10px;font-size:15px;transition:.2s}
+.btn-office{background:#111827;color:white}
+.btn-cust{background:#059669;color:white}
+.btn:active{transform:scale(.98)}
+input,select,textarea{width:100%;padding:12px;margin:7px 0;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;background:#f8fafc}
+input:focus,select:focus,textarea:focus{border-color:#111827;outline:none;background:white}
+.complaint-card{background:white;margin:12px 0;padding:16px;border-radius:14px;border-left:5px solid #111827;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;color:white;font-weight:600;text-transform:uppercase}
+.pending{background:#f59e0b}.done{background:#10b981}.assigned{background:#3b82f6}.newinstall{background:#8b5cf6}
+.hidden{display:none}
+.cat-label{font-size:12px;color:#64748b;font-weight:600;margin-top:8px;display:block}
+.required{color:red}
+</style>
+</head>
+<body>
+<div class="header">
+<img src="https://cybotech.in/wp-content/uploads/2024/01/Cybotech-Logo-1.png" alt="Cybotech">
+<div><b>CYBOTECH CCTV</b><br><small>📍 Cheruvannur | 📞 7592996699</small></div>
+</div>
+
+<div id="roleSelect" class="login-box">
+<h2 style="text-align:center">CCTV Service App</h2>
+<p style="text-align:center;font-size:12px;color:#64748b;margin:8px 0 16px">🔒 ഓരോ കസ്റ്റമറും തന്റേത് മാത്രം കാണും</p>
+<button class="btn btn-office" onclick="showOfficeLogin()">🏢 ഓഫീസ് ലോഗിൻ</button>
+<button class="btn btn-cust" onclick="showCustomerLogin()">👤 ഉപഭോക്താവ് ലോഗിൻ</button>
+<div style="margin-top:18px;padding:12px;background:#f8fafc;border-radius:10px;font-size:12px">
+<b>CCTV Complaint Types:</b><br>
+• വീഡിയോ / ദൃശ്യ പ്രശ്നങ്ങൾ<br>
+• റെക്കോർഡിംഗ് / DVR / NVR<br>
+• പവർ / നെറ്റ്വർക്ക് / ആപ്പ് പ്രശ്നങ്ങൾ etc.
+</div>
+</div>
+
+<div id="officeLogin" class="login-box hidden">
+<h3>ഓഫീസ് ലോഗിൻ</h3>
+<input type="password" id="officePass" placeholder="Password: cybotech123">
+<button class="btn btn-office" onclick="loginOffice()">Login</button>
+<button class="btn" style="background:#f1f5f9" onclick="backToRole()">Back</button>
+</div>
+
+<div id="customerLogin" class="login-box hidden">
+<h3>ഉപഭോക്താവ് ലോഗിൻ</h3>
+<p style="font-size:12px;color:#065f46;background:#ecfdf5;padding:10px;border-radius:10px">🔒 നിങ്ങളുടെ ഫോൺ നമ്പറിന്റെ CCTV പരാതികൾ മാത്രം കാണും</p>
+<input type="tel" id="custPhoneLogin" placeholder="നിങ്ങളുടെ ഫോൺ നമ്പർ (10 digit)">
+<button class="btn btn-cust" onclick="loginCustomer()">എന്റെ CCTV പരാതികൾ കാണുക</button>
+<button class="btn" style="background:#f1f5f9" onclick="backToRole()">Back</button>
+</div>
+
+<div id="officeDash" class="hidden" style="padding:14px;max-width:820px;margin:0 auto">
+<h2>CCTV Dashboard <button style="float:right;padding:7px 14px;border-radius:10px;border:1px solid #e2e8f0;background:white" onclick="logout()">Logout</button></h2>
+<div style="display:flex;gap:8px;margin:14px 0">
+<div style="flex:1;background:white;padding:14px;border-radius:12px;text-align:center"><b id="totalCount">0</b><br><small>Total</small></div>
+<div style="flex:1;background:#fef3c7;padding:14px;border-radius:12px;text-align:center"><b id="pendingCount">0</b><br><small>Pending</small></div>
+<div style="flex:1;background:#d1fae5;padding:14px;border-radius:12px;text-align:center"><b id="doneCount">0</b><br><small>Done</small></div>
+<div style="flex:1;background:#ede9fe;padding:14px;border-radius:12px;text-align:center"><b id="installCount">0</b><br><small>New Install</small></div>
+</div>
+<button class="btn btn-office" onclick="document.getElementById('addForm').classList.toggle('hidden')">+ പുതിയ CCTV പരാതി / New Installation</button>
+
+<div id="addForm" class="hidden" style="background:white;padding:18px;border-radius:14px;margin-top:12px">
+<h3 style="margin-bottom:10px">പുതിയ Request</h3>
+<label class="cat-label">Request Type <span class="required">*</span></label>
+<select id="reqType" onchange="toggleReqType()">
+<option value="complaint">🔧 Complaint / Service</option>
+<option value="newinstall">🆕 New Installation</option>
+</select>
+
+<input id="cName" placeholder="Customer Name *">
+<input id="cPhone" placeholder="Customer Phone * (ഈ നമ്പറിൽ മാത്രം കാണും)">
+<input id="cPlace" placeholder="Place / Address *">
+
+<label class="cat-label">പ്രധാന Complaint Heading <span class="required">*</span></label>
+<select id="cCategory">
+<option value="">-- തിരഞ്ഞെടുക്കുക --</option>
+<option value="വീഡിയോ / ദൃശ്യ പ്രശ്നങ്ങൾ">📹 വീഡിയോ / ദൃശ്യ പ്രശ്നങ്ങൾ (No video, blurry, black & white)</option>
+<option value="റെക്കോർഡിംഗ് / സ്റ്റോറേജ് പ്രശ്നങ്ങൾ">💾 റെക്കോർഡിംഗ് / സ്റ്റോറേജ് പ്രശ്നങ്ങൾ (Not recording, HDD full)</option>
+<option value="പവർ പ്രശ്നങ്ങൾ">⚡ പവർ പ്രശ്നങ്ങൾ (Camera off, adapter, power supply)</option>
+<option value="കണക്റ്റിവിറ്റി / നെറ്റ്വർക്ക് പ്രശ്നങ്ങൾ">🌐 കണക്റ്റിവിറ്റി / നെറ്റ്വർക്ക് പ്രശ്നങ്ങൾ (Offline, cable, WiFi)</option>
+<option value="DVR / NVR പ്രശ്നങ്ങൾ">🖥️ DVR / NVR പ്രശ്നങ്ങൾ (DVR not working, beep, no display)</option>
+<option value="സമയം / തീയതി പ്രശ്നങ്ങൾ">🕒 സമയം / തീയതി പ്രശ്നങ്ങൾ (Wrong time, date reset)</option>
+<option value="പാസ്വേഡ് / ലോഗിൻ പ്രശ്നങ്ങൾ">🔑 പാസ്വേഡ് / ലോഗിൻ പ്രശ്നങ്ങൾ (Password forgot, locked)</option>
+<option value="ക്യാമറ ആംഗിൾ / പൊസിഷൻ പ്രശ്നങ്ങൾ">📷 ക്യാമറ ആംഗിൾ / പൊസിഷൻ പ്രശ്നങ്ങൾ (Angle change, reposition)</option>
+<option value="മൊബൈൽ ആപ്പ് / റിമോട്ട് വ്യൂ പ്രശ്നങ്ങൾ">📱 മൊബൈൽ ആപ്പ് / റിമോട്ട് വ്യൂ പ്രശ്നങ്ങൾ (App not working, remote view)</option>
+<option value="മറ്റ് CCTV പ്രശ്നങ്ങൾ">🔧 മറ്റ് CCTV പ്രശ്നങ്ങൾ (Specify below)</option>
+<option value="New Installation">🆕 New Installation Requirement</option>
+</select>
+
+<div id="installFields" class="hidden" style="background:#f5f3ff;padding:12px;border-radius:10px;margin:8px 0">
+<label class="cat-label">Installation Details</label>
+<select id="installType">
+<option>New Full CCTV Setup</option>
+<option>Additional Camera</option>
+<option>DVR/NVR Upgrade</option>
+<option>Camera Replacement</option>
+<option>HDD Upgrade</option>
+<option>Other Installation</option>
+</select>
+<input id="installCountInput" type="number" placeholder="No. of Cameras Required">
+</div>
+
+<textarea id="cIssue" rows="3" placeholder="വിവരണം / Description * - എന്താണ് പ്രശ്നം?"></textarea>
+<select id="cTech"><option value="">Assign Technician</option><option>Rajesh</option><option>Suresh</option><option>Aneesh</option><option>Office Team</option></select>
+<button class="btn btn-office" onclick="addComplaint()">💾 Save - Customer ന് Private ആയി കാണും</button>
+</div>
+<div id="officeList"></div>
+</div>
+
+<div id="customerDash" class="hidden" style="padding:14px;max-width:820px;margin:0 auto">
+<h2>എന്റെ CCTV പരാതികൾ <button style="float:right;padding:7px 14px;border-radius:10px;border:1px solid #e2e8f0;background:white" onclick="logout()">Logout</button></h2>
+<p id="custWelcome" style="background:#ecfdf5;padding:12px;border-radius:12px;margin:10px 0;font-weight:600"></p>
+<div style="background:#fffbeb;padding:10px;border-radius:10px;font-size:12px;margin-bottom:12px">🔒 Privacy: ഈ ഫോൺ നമ്പറിന്റെ CCTV പരാതികൾ / Installation requests മാത്രം</div>
+<div id="customerList"></div>
+<button class="btn btn-cust" onclick="document.getElementById('custAddForm').classList.toggle('hidden')">+ പുതിയ CCTV പരാതി / New Installation</button>
+<div id="custAddForm" class="hidden" style="background:white;padding:16px;border-radius:14px;margin-top:10px">
+<label class="cat-label">Request Type</label>
+<select id="ccReqType" onchange="toggleCustReqType()">
+<option value="complaint">🔧 Complaint / Service</option>
+<option value="newinstall">🆕 New Installation</option>
+</select>
+<input id="ccName" placeholder="Your Name">
+<input id="ccPlace" placeholder="Place">
+<label class="cat-label">Complaint Heading</label>
+<select id="ccCategory">
+<option value="">-- തിരഞ്ഞെടുക്കുക --</option>
+<option value="വീഡിയോ / ദൃശ്യ പ്രശ്നങ്ങൾ">📹 വീഡിയോ / ദൃശ്യ പ്രശ്നങ്ങൾ</option>
+<option value="റെക്കോർഡിംഗ് / സ്റ്റോറേജ് പ്രശ്നങ്ങൾ">💾 റെക്കോർഡിംഗ് / സ്റ്റോറേജ്</option>
+<option value="പവർ പ്രശ്നങ്ങൾ">⚡ പവർ പ്രശ്നങ്ങൾ</option>
+<option value="കണക്റ്റിവിറ്റി / നെറ്റ്വർക്ക് പ്രശ്നങ്ങൾ">🌐 നെറ്റ്വർക്ക് പ്രശ്നങ്ങൾ</option>
+<option value="DVR / NVR പ്രശ്നങ്ങൾ">🖥️ DVR / NVR പ്രശ്നങ്ങൾ</option>
+<option value="സമയം / തീയതി പ്രശ്നങ്ങൾ">🕒 സമയം / തീയതി പ്രശ്നങ്ങൾ</option>
+<option value="പാസ്വേഡ് / ലോഗിൻ പ്രശ്നങ്ങൾ">🔑 പാസ്വേഡ് പ്രശ്നങ്ങൾ</option>
+<option value="ക്യാമറ ആംഗിൾ / പൊസിഷൻ പ്രശ്നങ്ങൾ">📷 ക്യാമറ ആംഗിൾ</option>
+<option value="മൊബൈൽ ആപ്പ് / റിമോട്ട് വ്യൂ പ്രശ്നങ്ങൾ">📱 മൊബൈൽ ആപ്പ് പ്രശ്നങ്ങൾ</option>
+<option value="മറ്റ് CCTV പ്രശ്നങ്ങൾ">🔧 മറ്റ് പ്രശ്നങ്ങൾ</option>
+<option value="New Installation">🆕 New Installation</option>
+</select>
+<textarea id="ccIssue" rows="3" placeholder="വിവരണം - എന്താണ് പ്രശ്നം / എന്ത് Installation വേണം?"></textarea>
+<button class="btn btn-cust" onclick="addComplaintCustomer()">Submit</button>
+</div>
+</div>
+
+<script>
+let complaints = JSON.parse(localStorage.getItem('cybotech_cctv_complaints') || '[]');
+let currentCustomerPhone = localStorage.getItem('currentCustomerPhone') || '';
+function normalizePhone(p){ return (p||'').toString().replace(/[^0-9]/g,'').slice(-10); }
+function save(){ localStorage.setItem('cybotech_cctv_complaints', JSON.stringify(complaints)); render(); }
+
+function showOfficeLogin(){ document.getElementById('roleSelect').classList.add('hidden'); document.getElementById('officeLogin').classList.remove('hidden'); }
+function showCustomerLogin(){ document.getElementById('roleSelect').classList.add('hidden'); document.getElementById('customerLogin').classList.remove('hidden'); }
+function backToRole(){ document.getElementById('officeLogin').classList.add('hidden'); document.getElementById('customerLogin').classList.add('hidden'); document.getElementById('roleSelect').classList.remove('hidden'); }
+
+function toggleReqType(){
+ let t = document.getElementById('reqType').value;
+ document.getElementById('installFields').classList.toggle('hidden', t!=='newinstall');
+ if(t==='newinstall') document.getElementById('cCategory').value='New Installation';
+}
+function toggleCustReqType(){
+ let t = document.getElementById('ccReqType').value;
+ if(t==='newinstall') document.getElementById('ccCategory').value='New Installation';
+}
+
+function loginOffice(){
+ if(document.getElementById('officePass').value==='cybotech123'){
+   document.getElementById('officeLogin').classList.add('hidden');
+   document.getElementById('officeDash').classList.remove('hidden');
+   render();
+ } else alert('Wrong password! Use cybotech123');
+}
+function loginCustomer(){
+ let phone = document.getElementById('custPhoneLogin').value.trim();
+ if(phone.length < 8){ alert('ഫോൺ നമ്പർ നൽകുക'); return; }
+ currentCustomerPhone = normalizePhone(phone);
+ localStorage.setItem('currentCustomerPhone', currentCustomerPhone);
+ document.getElementById('customerLogin').classList.add('hidden');
+ document.getElementById('customerDash').classList.remove('hidden');
+ document.getElementById('custWelcome').innerHTML = '📱 '+currentCustomerPhone+' - CCTV Requests (Private)';
+ renderCustomer();
+}
+function logout(){ 
+ document.getElementById('officeDash').classList.add('hidden');
+ document.getElementById('customerDash').classList.add('hidden');
+ document.getElementById('roleSelect').classList.remove('hidden');
+}
+
+function addComplaint(){
+ let reqType = document.getElementById('reqType').value;
+ let c = {
+   id: Date.now(),
+   reqType: reqType,
+   customerName: document.getElementById('cName').value.trim(),
+   customerPhone: normalizePhone(document.getElementById('cPhone').value),
+   place: document.getElementById('cPlace').value.trim(),
+   category: document.getElementById('cCategory').value,
+   issue: document.getElementById('cIssue').value.trim(),
+   installType: document.getElementById('installType')?.value || '',
+   installCount: document.getElementById('installCountInput')?.value || '',
+   technician: document.getElementById('cTech').value,
+   status: reqType==='newinstall' ? 'newinstall' : (document.getElementById('cTech').value ? 'assigned' : 'pending'),
+   date: new Date().toLocaleDateString('en-IN'),
+   time: new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
+ };
+ if(!c.customerName || !c.customerPhone || !c.category) { alert('Name, Phone, Complaint Heading required'); return; }
+ complaints.unshift(c);
+ save();
+ alert('✅ Saved! '+c.customerPhone+' നമ്പറിൽ മാത്രം കാണും (Private). Category: '+c.category);
+ document.getElementById('addForm').classList.add('hidden');
+ document.getElementById('cName').value='';document.getElementById('cPhone').value='';document.getElementById('cIssue').value='';
+}
+
+function addComplaintCustomer(){
+ let reqType = document.getElementById('ccReqType').value;
+ let c = {
+   id: Date.now(),
+   reqType: reqType,
+   customerName: document.getElementById('ccName').value || 'Customer',
+   customerPhone: currentCustomerPhone,
+   place: document.getElementById('ccPlace').value,
+   category: document.getElementById('ccCategory').value,
+   issue: document.getElementById('ccIssue').value,
+   installType: '',
+   installCount: '',
+   technician: '',
+   status: reqType==='newinstall' ? 'newinstall' : 'pending',
+   date: new Date().toLocaleDateString('en-IN'),
+   time: new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
+ };
+ if(!c.category || !c.issue){ alert('Heading & Description required'); return; }
+ complaints.unshift(c);
+ save();
+ alert('✅ സമർപ്പിച്ചു! Office കാണും.');
+ document.getElementById('custAddForm').classList.add('hidden');
+ renderCustomer();
+}
+
+function render(){
+ document.getElementById('totalCount').innerText = complaints.length;
+ document.getElementById('pendingCount').innerText = complaints.filter(c=>c.status==='pending'||c.status==='assigned').length;
+ document.getElementById('doneCount').innerText = complaints.filter(c=>c.status==='done').length;
+ document.getElementById('installCount').innerText = complaints.filter(c=>c.reqType==='newinstall'||c.category==='New Installation').length;
+ let html='';
+ complaints.forEach(c=>{
+   let badgeClass = c.status==='newinstall' ? 'newinstall' : c.status;
+   let icon = c.reqType==='newinstall' ? '🆕' : '🔧';
+   html+=`<div class="complaint-card" style="border-left-color:${c.reqType==='newinstall'?'#8b5cf6':'#111827'}">
+   ${icon} <b>${c.customerName}</b> - ${c.customerPhone} <span class="badge ${badgeClass}">${c.status==='newinstall'?'NEW INSTALL':c.status}</span><br>
+   <small>📍 ${c.place} | ${c.date} ${c.time} | 🔒 Private to ${c.customerPhone}</small><br>
+   <div style="background:#f8fafc;padding:8px;border-radius:8px;margin:6px 0"><b>${c.category}</b>${c.installType ? '<br>→ '+c.installType+(c.installCount?' ('+c.installCount+' cams)':'') : ''}<br>${c.issue}</div>
+   ${c.technician ? '👨‍🔧 '+c.technician : '⏳ Not assigned'}
+   <br><button onclick="markDone(${c.id})" style="margin-top:8px;padding:6px 12px;background:#10b981;color:white;border:none;border-radius:8px">Mark Done</button>
+   <button onclick="deleteComplaint(${c.id})" style="margin-top:8px;padding:6px 12px;background:#ef4444;color:white;border:none;border-radius:8px;margin-left:5px">Delete</button>
+   </div>`;
+ });
+ document.getElementById('officeList').innerHTML = html || '<p style="text-align:center;margin-top:20px;color:#64748b">No CCTV complaints yet</p>';
+ if(!document.getElementById('customerDash').classList.contains('hidden')) renderCustomer();
+}
+
+function renderCustomer(){
+ let filtered = complaints.filter(c => normalizePhone(c.customerPhone) === currentCustomerPhone);
+ let html='';
+ if(filtered.length===0) html='<p style="text-align:center;padding:20px;background:white;border-radius:12px">നിങ്ങൾക്ക് CCTV പരാതികൾ ഇല്ല<br><small>Office add ചെയ്യുമ്പോൾ ഇവിടെ കാണാം</small></p>';
+ else filtered.forEach(c=>{
+   let icon = c.reqType==='newinstall' ? '🆕' : '🔧';
+   let badgeClass = c.status==='newinstall' ? 'newinstall' : c.status;
+   html+=`<div class="complaint-card" style="border-left-color:${c.reqType==='newinstall'?'#8b5cf6':'#059669'}">
+   ${icon} <b>${c.category}</b> <span class="badge ${badgeClass}">${c.status==='newinstall'?'NEW INSTALL':c.status}</span><br>
+   <small>${c.date} ${c.time} | ${c.place} | 🔒 Only you</small><br>
+   <div style="background:#f8fafc;padding:8px;border-radius:8px;margin:6px 0">${c.issue}${c.installType ? '<br><b>'+c.installType+'</b>' : ''}</div>
+   ${c.technician ? '👨‍🔧 Technician: '+c.technician : '⏳ Technician assign ചെയ്യും'}
+   </div>`;
+ });
+ document.getElementById('customerList').innerHTML = html;
+}
+
+function markDone(id){ let c=complaints.find(x=>x.id===id); if(c){ c.status='done'; save(); } }
+function deleteComplaint(id){ if(confirm('Delete? Customer will not see it anymore')){ complaints=complaints.filter(x=>x.id!==id); save(); } }
+
+render();
+</script>
+</body>
+</html>
